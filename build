@@ -1,0 +1,16 @@
+#!/bin/bash
+
+docker run -it --rm -u 1001:1001 -v $HOME/.cache:/.cache -v ${PWD}:/go/hourage -v ~/bin:/go/bin golang:1.21-alpine3.18 go install -C hourage ./cmd/*
+
+if [[ -z $1 ]]; then exit 1; fi
+for k in `ls /opt/hourage`; do
+  file=`basename $k`
+  md5bin=`md5sum $HOME/bin/$file | cut -d\  -f 1`
+  md5hrs=`md5sum $k | cut -d\  -f 1`
+  if [[ $md5hrs != $md5bin ]]; then
+    echo "$file md5sums did not match"
+    echo "$md5bin"
+    echo "$md5hrs"
+    cp $HOME/bin/$file $k
+  fi
+done
